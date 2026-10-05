@@ -40,26 +40,15 @@ app.use(express.static(path.join(__dirname, "public")));
 const sessionOptions = {
   secret: "mysupersecretcode",
   resave: false,
-  saveUnitialized: true,
+  saveUninitialized: true,
   cookie: {
-    expiers: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
   },
 };
 
-app.get("/", (req, res) => {
-  res.redirect("/listings");
-});
-
-// app.use(session(sessionOptions));
-app.use(
-  session({
-    secret: "your_secret_key",
-    resave: false,
-    saveUninitialized: false, // Yeh line add karne se warning hat jayegi
-  }),
-);
+app.use(session(sessionOptions));
 
 app.use(flash());
 
@@ -77,15 +66,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.get("/demouser", async (req, res) => {
-//   let fakeUser = new User({
-//     eamil: "student@gmail.com",
-//     username: "delta-student",
-//   });
-
-//   let registerUser = await User.register(fakeUser, "helloworld");
-//   res.send(registerUser);
-// });
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
@@ -93,8 +76,8 @@ app.use("/", userRouter);
 
 //  Error handling
 app.use((err, req, res, next) => {
-  let { statusCode = 500, message = "Something went wrong!!" } = err;
-  res.status(statusCode).render("error.ejs", { message });
+  let { statusCode = 500, message = "Something went wrong" } = err;
+  res.status(statusCode).render("errorHandler/error.ejs", { message });
 });
 
 app.listen(8080, () => {
